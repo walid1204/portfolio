@@ -285,6 +285,18 @@ $(function () {
 
 });
 
+function copyEmail(el, email) {
+    navigator.clipboard.writeText(email).then(() => {
+        const wrap = $(el);
+        wrap.addClass('copied');
+        setTimeout(() => {
+            wrap.removeClass('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+
 
 
 function scroll_animations() {
