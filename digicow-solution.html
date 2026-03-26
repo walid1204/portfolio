@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solution Documentation - DigiCow Challenge</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon_w.png">
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+    <style>
+        :root {
+            --primary_color: #13b56a; /* Adjust this if the portfolio uses a different primary color */
+            --bg_color: #0f0f11;
+            --text_color: #999;
+            --heading_color: #fff;
+            --card_bg: rgba(255, 255, 255, 0.03);
+            --border_color: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg_color);
+            color: var(--text_color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text_color);
+            text-decoration: none;
+            margin-bottom: 40px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary_color);
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--heading_color);
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--primary_color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .doc-section {
+            background: var(--card_bg);
+            border: 1px solid var(--border_color);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .doc-section:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .doc-section h2 {
+            color: var(--heading_color);
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border_color);
+            padding-bottom: 15px;
+        }
+
+        .doc-section h2 i {
+            color: var(--primary_color);
+            font-size: 28px;
+            margin-right: 15px;
+        }
+
+        h3 {
+            color: var(--heading_color);
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #d1d1d1;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 15px;
+            }
+            .doc-section {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="header">
+            <div class="subtitle">DigiCow Farmer Training Adoption Challenge</div>
+            <h1>Solution Documentation</h1>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-bullseye"></i> 1) Overview & Objectives</h2>
+            <p>The goal is to predict adoption probabilities within 7, 90, and 120 days after a farmer's first training, using only information available at the time of training. The solution outputs calibrated probabilities for the required targets and generates a submission CSV matching the competition format.</p>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-project-diagram"></i> 2) ETL Process</h2>
+            
+            <h3>Extract</h3>
+            <ul>
+                <li>Reads the provided CSV files (<code>Prior.csv</code>, <code>Test.csv</code>) using pandas.</li>
+                <li>Input format is standard CSV.</li>
+            </ul>
+
+            <h3>Transform</h3>
+            <ul>
+                <li>Data cleaning and type coercion (dates, missing values).</li>
+                <li>Normalization of list-like fields (e.g., training topics).</li>
+                <li>Construction of deterministic event-level records for training and test.</li>
+            </ul>
+
+            <h3>Load</h3>
+            <ul>
+                <li>All intermediate tables are kept in-memory as DataFrames.</li>
+                <li>The final result is exported as a submission CSV.</li>
+            </ul>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-layer-group"></i> 3) Data Modeling</h2>
+            
+            <h3>Feature Engineering</h3>
+            <ul>
+                <li>Categorical and group-level aggregations (e.g., farmer / trainer / topic aggregates).</li>
+                <li>Time-derived features from training dates.</li>
+                <li>Text-derived topic representations using TF-IDF and dimensionality reduction (SVD).</li>
+            </ul>
+
+            <h3>Models</h3>
+            <ul>
+                <li>CatBoostClassifier</li>
+                <li>XGBoost (<code>XGBClassifier</code>)</li>
+                <li>LightGBM (<code>LGBMClassifier</code>)</li>
+                <li>Stacking meta-model: <code>LogisticRegression</code> on base model predictions</li>
+            </ul>
+
+            <h3>Validation</h3>
+            <ul>
+                <li>GroupKFold cross-validation (5 folds) to reduce leakage across grouped entities.</li>
+                <li>Metrics monitored during development: Log Loss and ROC-AUC (as per competition rules).</li>
+            </ul>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-microchip"></i> 4) Inference</h2>
+            <p>The trained ensemble produces raw probabilities for each required target column. No thresholding or rounding is applied.</p>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-stopwatch"></i> 5) Runtime</h2>
+            <p>End-to-end runtime (data processing + modeling + inference): ~51 minutes on CPU.</p>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-bug"></i> 6) Error Handling & Logging</h2>
+            <ul>
+                <li>The code prints progress messages for major stages.</li>
+                <li>If required files are missing, the runner script fails fast with a clear error message.</li>
+            </ul>
+        </div>
+
+        <div class="doc-section">
+            <h2><i class="las la-server"></i> 7) Maintenance & Monitoring</h2>
+            <p>For production use, recommended checks include schema validation, drift monitoring on feature distributions, and periodic retraining when data shifts are detected.</p>
+        </div>
+    </div>
+
+</body>
+</html>
